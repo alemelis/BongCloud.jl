@@ -1,20 +1,20 @@
-# Ke2.jl
+# BongCloud.jl
 
-A general-purpose Julia client for the [Lichess API](https://lichess.org/api). Chess-agnostic — it speaks HTTP and JSON, not bitboards. Anyone in the Julia ecosystem can use it: bot builders, game scrapers, ML researchers, puzzle nerds.
+A general-purpose Julia client for the [Lichess API](https://lichess.org/api). Chess-agnostic — it speaks HTTP and JSON, not bitboards.
 
-**Ke2 knows nothing about chess.** It sends strings and receives structs. Dependencies: `HTTP.jl` + `JSON3.jl`.
+**BongCloud knows nothing about chess.** It sends strings and receives structs. Dependencies: `HTTP.jl` + `JSON3.jl`.
 
 ## Installation
 
 ```julia
 using Pkg
-Pkg.add("Ke2")
+Pkg.add("BongCloud")
 ```
 
 ## Quick start
 
 ```julia
-using Ke2
+using BongCloud
 
 # anonymous client (read-only endpoints)
 c = LichessClient()
@@ -213,7 +213,7 @@ pgn = export_study_chapter(c, studyId, chapterId)
 
 ## Streaming pattern
 
-Lichess streams NDJSON. Ke2 wraps every streaming endpoint in a `Channel{T}` with a buffer of 64, so you consume it with a plain `for` loop:
+Lichess streams NDJSON. BongCloud wraps every streaming endpoint in a `Channel{T}` with a buffer of 64, so you consume it with a plain `for` loop:
 
 ```julia
 for event in stream_events(c)
@@ -243,7 +243,7 @@ Event           — from /api/stream/event
 
 ## Ecosystem
 
-Ke2.jl is a pure API client. It pairs naturally with:
+BongCloud.jl is a pure API client. It pairs naturally with:
 
 - A chess rules engine (move generation, validation)
 - A search/AI engine (choosing which move to play)

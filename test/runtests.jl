@@ -1,7 +1,7 @@
-using Ke2
+using BongCloud
 using Test
 
-@testset "Ke2.jl" begin
+@testset "BongCloud.jl" begin
 
     @testset "LichessClient" begin
         c = LichessClient()
@@ -12,10 +12,10 @@ using Test
         c2 = LichessClient(token="lip_test")
         @test c2.token == "lip_test"
 
-        h = Ke2.Types.auth_headers(c2)
+        h = BongCloud.Types.auth_headers(c2)
         @test h["Authorization"] == "Bearer lip_test"
 
-        h_anon = Ke2.Types.auth_headers(c)
+        h_anon = BongCloud.Types.auth_headers(c)
         @test isempty(h_anon)
     end
 

@@ -8,7 +8,7 @@
 ##
 ## Design: fetch shared fixtures once, reuse across testsets to minimise API hits.
 
-using Ke2
+using BongCloud
 using Test
 
 const CLIENT = LichessClient()
@@ -16,7 +16,7 @@ const AUTH_CLIENT = let t = get(ENV, "LICHESS_TOKEN", nothing)
     isnothing(t) ? nothing : LichessClient(token=t)
 end
 
-println("Running Ke2.jl integration tests against lichess.org…")
+println("Running BongCloud.jl integration tests against lichess.org…")
 println("Auth client: ", isnothing(AUTH_CLIENT) ? "not available (set LICHESS_TOKEN)" : "available")
 println()
 

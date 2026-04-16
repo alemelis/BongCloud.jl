@@ -1,4 +1,4 @@
-module Ke2
+module BongCloud
 
 include("Types.jl")
 include("Client.jl")
