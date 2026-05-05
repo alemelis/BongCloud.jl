@@ -1,11 +1,11 @@
 module Bot
 
 using JSON3
-using ..Types: LichessClient, Event, GameStateEvent, GameFull, GameState, ChatLine
+using ..Types: LichessClient, Event, GameStateEvent, GameFull, GameState, ChatLine, UnknownGameEvent
 using ..Client: request, request_stream, parse_response
 
 export upgrade_to_bot, get_online_bots, stream_events,
-       stream_game, make_move, abort_game, resign_game, send_chat
+    stream_game, make_move, abort_game, resign_game, send_chat
 
 const CHANNEL_BUFFER = 64
 
@@ -30,10 +30,17 @@ function stream_events(c::LichessClient)
                 put!(ch, JSON3.read(line, Event))
             catch e
                 # Parse failed — emit a bare Event so the caller can at least see the type
-                raw = try JSON3.read(line) catch; nothing end
-                t   = raw !== nothing ? string(get(raw, :type, "unknown")) : "unknown"
-                @warn "stream_events: failed to parse event type=$t line=$(first(line,200))" exception=e
-                try put!(ch, Event(t, nothing, nothing)) catch; end
+                raw = try
+                    JSON3.read(line)
+                catch
+                    nothing
+                end
+                t = raw !== nothing ? string(get(raw, :type, "unknown")) : "unknown"
+                @warn "stream_events: failed to parse event type=$t line=$(first(line,200))" exception = e
+                try
+                    put!(ch, Event(t, nothing, nothing))
+                catch
+                end
             end
         end
     end
@@ -49,7 +56,8 @@ function _parse_game_event(line::String)::GameStateEvent
     elseif t == "chatLine"
         return JSON3.read(line, ChatLine)
     else
-        error("Unknown game event type: $t")
+        @debug "Ignoring game event type=$t"
+        return UnknownGameEvent(string(t), obj)
     end
 end
 
@@ -62,9 +70,9 @@ function stream_game(c::LichessClient, game_id::String)
 end
 
 function make_move(c::LichessClient, game_id::String, move::String;
-                   offering_draw::Bool=false)
+    offering_draw::Bool=false)
     resp = request("POST", c, "/api/bot/game/$game_id/move/$move";
-                   query=(offeringDraw=offering_draw,))
+        query=(offeringDraw=offering_draw,))
     resp.status >= 400 && error("HTTP $(resp.status): $(String(resp.body))")
     JSON3.read(resp.body)[:ok]
 end
@@ -83,7 +91,7 @@ end
 
 function send_chat(c::LichessClient, game_id::String, room::String, text::String)
     resp = request("POST", c, "/api/bot/game/$game_id/chat";
-                   body=(room=room, text=text))
+        body=(room=room, text=text))
     resp.status >= 400 && error("HTTP $(resp.status): $(String(resp.body))")
     JSON3.read(resp.body)[:ok]
 end
